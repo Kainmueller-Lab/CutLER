@@ -10,6 +10,14 @@ import PIL.Image as Image
 import torch
 from torchvision import transforms
 from scipy import ndimage
+
+try:
+    detectron2_path = os.path.expanduser('~/Documents/detectron2')  # Expands the `~` to the full home directory path
+    if detectron2_path not in sys.path:
+        sys.path.append(detectron2_path)
+except (ImportError, FileNotFoundError) as e:
+    pass
+
 from detectron2.utils.colormap import random_color
 
 import dino # model
