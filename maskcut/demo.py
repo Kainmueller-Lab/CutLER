@@ -36,7 +36,7 @@ if __name__ == "__main__":
     parser.add_argument('--vit-arch', type=str, default='small', choices=['base', 'small'], help='which architecture')
     parser.add_argument('--vit-feat', type=str, default='k', choices=['k', 'q', 'v', 'kqv'], help='which features')
     parser.add_argument('--patch-size', type=int, default=8, choices=[16, 8], help='patch size')
-    parser.add_argument('--img-path', type=str, default=None, help='single image visualization')
+    parser.add_argument('--img-path', type=str, default='imgs/demo1.jpg', help='single image visualization')
     parser.add_argument('--tau', type=float, default=0.15, help='threshold used for producing binary graph')
 
     # additional arguments
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser.add_argument('--pretrain_path', type=str, default=None, help='path to pretrained model')
     parser.add_argument('--N', type=int, default=3, help='the maximum number of pseudo-masks per image')
     parser.add_argument('--cpu', action='store_true', help='use cpu')
-    parser.add_argument('--output_path', type=str,  default='', help='path to save outputs')
+    parser.add_argument('--output_path', type=str,  default='Results/', help='path to save outputs')
 
     args = parser.parse_args()
     print (args)
@@ -105,4 +105,5 @@ if __name__ == "__main__":
     input = np.array(I)
     for pseudo_mask in pseudo_mask_list:
         input = vis_mask(input, pseudo_mask, random_color(rgb=True))
+    os.makedirs(args.output_path, exist_ok=True)
     input.save(os.path.join(args.output_path, "demo.jpg"))
