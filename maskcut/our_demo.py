@@ -55,14 +55,14 @@ def custom_get_affinity_matrix(feats, tau):
     A = (feats.transpose(0, 1) @ feats).cpu().numpy()
 
     # A = A > tau
-    A = np.exp(A*3)
+    A = np.exp(A * 3)
 
     A = A.astype(np.double)
 
     d_i = np.sum(A, axis=1)
     D = np.diag(d_i)
 
-    T = A/np.sum(A, axis=1, keepdims=True)
+    T = A / np.sum(A, axis=1, keepdims=True)
 
     return A, D, T
 
@@ -83,7 +83,7 @@ def custom_maskcut_forward(feats, dims, scales, init_image_size, tau=0, N=3, cpu
 
     # construct the affinity matrix
     A, D, T = custom_get_affinity_matrix(feats, tau)
-    N=2
+    N = 2
     # get the PCCA membership
     pcca_m = pcca(T, N)
     bipartitions = pcca_m.memberships.T
@@ -91,15 +91,15 @@ def custom_maskcut_forward(feats, dims, scales, init_image_size, tau=0, N=3, cpu
     # iterate over the bipartitions
     for i in range(N):
         # get the second smallest eigenvector
-        #eigenvec, second_smallest_vec = second_smallest_eigenvector(A, D)
+        # eigenvec, second_smallest_vec = second_smallest_eigenvector(A, D)
 
-        bipartition = bipartitions[i] # get_salient_areas(second_smallest_vec)
+        bipartition = bipartitions[i]  # get_salient_areas(second_smallest_vec)
 
         # get the index of the second smallest eigenvector
         index_sec_smallest = np.argmax(np.abs(bipartition))
 
         # make it binary
-        bipartition_binary = bipartition.copy() > 1/N
+        bipartition_binary = bipartition.copy() > 1 / N
 
         # check if we should reverse the partition based on:
         # 1) peak of the 2nd smallest eigvec 2) object centric bias
@@ -110,13 +110,14 @@ def custom_maskcut_forward(feats, dims, scales, init_image_size, tau=0, N=3, cpu
 
         if reverse:
             # reverse bipartition
-            bipartition = 1 - bipartition #
-            bipartition_binary = bipartition.copy() > 1/N
+            bipartition = 1 - bipartition  #
+            bipartition_binary = bipartition.copy() > 1 / N
             index_sec_smallest = np.argmax(bipartition)
 
         # get pxiels corresponding to the seed
         bipartition_binary = bipartition_binary.reshape(dims).astype(float)
-        _, _, _, cc = detect_box(bipartition_binary, index_sec_smallest, dims, scales=scales, initial_im_size=init_image_size)
+        _, _, _, cc = detect_box(bipartition_binary, index_sec_smallest, dims, scales=scales,
+                                 initial_im_size=init_image_size)
         pseudo_mask = np.zeros(dims)
         pseudo_mask[cc[0], cc[1]] = 1
         pseudo_mask = torch.from_numpy(pseudo_mask)
@@ -172,7 +173,6 @@ def custom_maskcut(img_path, backbone, patch_size, tau, N=1, fixed_size=480, cpu
     return bipartitions, eigvecs, I_new
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('MaskCut Demo')
     # default arguments
@@ -213,7 +213,7 @@ if __name__ == "__main__":
         backbone.cuda()
 
     bipartitions, _, I_new = custom_maskcut(args.img_path, backbone, args.patch_size, args.tau, \
-                                     N=args.N, fixed_size=args.fixed_size, cpu=args.cpu)
+                                            N=args.N, fixed_size=args.fixed_size, cpu=args.cpu)
 
     I = Image.open(args.img_path).convert('RGB')
     width, height = I.size
@@ -251,4 +251,3 @@ if __name__ == "__main__":
         input = vis_mask(input, pseudo_mask, random_color(rgb=True))
     os.makedirs(args.output_path, exist_ok=True)
     input.save(os.path.join(args.output_path, "demo.jpg"))
-
