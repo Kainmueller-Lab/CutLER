@@ -331,6 +331,9 @@ class ViTFeat(nn.Module):
                 q = q[:, 1:].transpose(1, 2).reshape(bs, self.feat_dim, feat_h * feat_w)
                 v = v[:, 1:].transpose(1, 2).reshape(bs, self.feat_dim, feat_h * feat_w)
                 feats = torch.cat([k, q, v], dim=1)
+            elif self.vit_feat == "attn":
+                feats = attentions[:,:,0, 1:]
+                print(f"Only return the CLS token attention map (multi-head) with shape {feats.shape}")
             return feats
 
 

@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # default arguments
     parser.add_argument('--out-dir', type=str, help='output directory')
     parser.add_argument('--vit-arch', type=str, default='small', choices=['base', 'small'], help='which architecture')
-    parser.add_argument('--vit-feat', type=str, default='k', choices=['k', 'q', 'v', 'kqv'], help='which features')
+    parser.add_argument('--vit-feat', type=str, default='k', choices=['k', 'q', 'v', 'kqv',"attn"], help='which features')
     parser.add_argument('--patch-size', type=int, default=8, choices=[16, 8], help='patch size')
     parser.add_argument('--img-path', type=str, default='imgs/demo1.jpg', help='single image visualization')
     parser.add_argument('--tau', type=float, default=0.15, help='threshold used for producing binary graph')

@@ -168,6 +168,9 @@ def maskcut(img_path, backbone,patch_size, tau, N=1, fixed_size=480, cpu=False) 
     if not cpu: tensor = tensor.cuda()
     feat = backbone(tensor)[0]
 
+    if feat.shape[0] ==6 or feat.shape[0]==12:
+        raise Exception(f"Sorry, you are using attn features with shape {feat.shape}. Please change the following code for pcca+")
+
     _, bipartition, eigvec = maskcut_forward(feat, [feat_h, feat_w], [patch_size, patch_size], [h,w], tau, N=N, cpu=cpu)
 
     bipartitions += bipartition
