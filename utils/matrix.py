@@ -23,6 +23,6 @@ def construct_distant_penalty_matrix(patch_dimension, sigma=4):
     xv = xv.reshape(-1, 1)
     yv = yv.reshape(-1, 1)
 
-    R = sigma + np.exp(-((xv - xv.T) ** 2 + (yv - yv.T) ** 2) / (2 * sigma ** 2))
+    R = np.exp(-((xv - xv.T) ** 2 + (yv - yv.T) ** 2) / (2 * sigma ** 2))
 
     return R  # (patch_dimension ** 2, patch_dimension ** 2)
