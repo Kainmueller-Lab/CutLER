@@ -127,8 +127,10 @@ class MembershipEstimator(torch.nn.Module):
         self.net = net.to(device)
         self.T = torch.Tensor(A/A.sum(1, keepdims=True)).to(device)
         size = A.shape[0]
-        self.pi = torch.Tensor(estimate_left_eig(A, D, subset_by_index=[size-1,size-1])[1][:,0]).to(device)
-        self.pi = self.pi/self.pi.sum()
+        # self.pi = torch.Tensor(estimate_left_eig(A, D, subset_by_index=[size-1,size-1])[1][:,0]).to(device)
+        # self.pi = self.pi/self.pi.sum()
+        pi = np.diag(D)
+        self.pi = torch.Tensor(pi/pi.sum()).to(device)
         self.sym = sym
         self.lr = lr
         self.optimizer = None
