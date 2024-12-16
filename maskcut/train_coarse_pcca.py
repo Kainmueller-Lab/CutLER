@@ -208,7 +208,7 @@ class MembershipEstimator(torch.nn.Module):
         self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 
 PATCHSIZE = 8
-VIT_ARCH = 'small'
+VIT_ARCH = 'base'
 PRETRAIN_PATH = None
 VIT_FEAT = 'k'
 CUDA = True
@@ -233,7 +233,7 @@ def main():
     for (names, act) in [['shift', shift]]:  # [['set_min', set_min], ['softmax', softmax], ['softmax_3T', softmax_3T],
                         #  ['softmax_halfT', softmax_halfT], ['shift', shift]]
         n_eigvecs = 8
-        n_s = 3*8
+        n_s = 4*8
         n_figures = n_eigvecs
         figure, axes = plt.subplots(n_s, n_figures, figsize=(n_figures * 4, n_s * 4))
         for i in range(1, 9):
@@ -244,7 +244,7 @@ def main():
             size = T.shape[0]
             net=Membership(size,n_eigvecs)
             estimator=MembershipEstimator(net, A, D, weight_decay=0., lr=0.01)
-            scores = estimator.train(10000, 1000)
+            scores = estimator.train(3000, 1000)
             memberships = estimator.M
             T_coarse = estimator.T_coarse
             eigvals, eigvecs = np.linalg.eig(T_coarse)
@@ -255,9 +255,10 @@ def main():
             eigvals_origin_left, eigvecs_left = estimate_left_eig(A, D, subset_by_index=[size - n_eigvecs, size - 1])
 
             for j in range(n_eigvecs):
-                idx_right = (i-1)*3
+                idx_right = (i-1)*4
                 idx_left = idx_right+1
                 idx_coarse = idx_right + 2
+                idx_member = idx_right + 3
                 if HARD:
                     sign = np.sign(eigvecs_right[np.argmax(np.abs(eigvecs_right[:,j])),j])
                     e_r = eigvecs_right[:,j] * sign > np.max(np.abs(eigvecs_right[:,j]))*0.2
@@ -277,6 +278,12 @@ def main():
                 axes[idx_left, j].imshow(e_l.reshape(60,60))
                 axes[idx_coarse, j].set_title('Eigval: {:.3}'.format(eigvals[j]))
                 axes[idx_coarse, j].imshow(e_coarse.reshape(60,60))
+                if j< (n_eigvecs-1):
+                    axes[idx_member, j].set_title('Member: {:.3}'.format(eigvals[j]))
+                    axes[idx_member, j].imshow(memberships[:,j].reshape(60,60))
+                else:
+                    axes[idx_member, j].set_title('Member: {:.3}'.format(eigvals[j]))
+                    axes[idx_member, j].imshow(np.argmax(memberships, axis=-1).reshape(60,60), cmap='magma')
                 
         plt.savefig('./Results/res_eigvecs_NN_{}.jpg'.format(names))
 
